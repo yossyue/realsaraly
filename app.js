@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
-  const KEY = 'realsalary.v1';
+  const KEY = 'realsalary.v2';
   const DEFAULT_LIVING = [
     ['家賃', 70000], ['光熱費', 12000], ['通信費', 8000], ['食費', 40000],
     ['交通費(通勤以外)', 5000], ['日用品', 8000], ['保険・その他固定費', 10000],
@@ -10,6 +10,7 @@
     'workHours', 'days', 'breakMin', 'commuteMin', 'prepMin', 'otherMin'];
   const CHECKS = ['incBreak', 'incCommute', 'incPrep', 'incOther'];
 
+  const MAN = 10000;
   const yen = (n) => (isFinite(n) ? Math.round(n).toLocaleString('ja-JP') + '円' : '-');
   const num = (id) => Math.max(0, parseFloat($(id).value) || 0);
   const mode = () => document.querySelector('input[name=mode]:checked').value;
@@ -67,9 +68,9 @@
 
     let annualGross, bonus;
     if (isAnnual) {
-      annualGross = num('annual'); bonus = num('bonusAnnual');
+      annualGross = num('annual') * MAN; bonus = num('bonusAnnual') * MAN;
     } else {
-      const m = num('monthly');
+      const m = num('monthly') * MAN;
       bonus = m * num('bonusMonths');
       annualGross = m * 12 + bonus;
     }
