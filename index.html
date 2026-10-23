@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>可処分時給計算</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>可処分時給計算</h1>
+  <p class="lead">額面 → 手取り → 拘束時間あたりの時給 → 生活費を引いた「可処分時給」まで一気に出します。すべて概算で、入力内容はこのブラウザ内にだけ保存されます。</p>
+
+  <section class="card">
+    <h2>1. 収入</h2>
+    <div class="seg" role="radiogroup" aria-label="入力方法">
+      <label><input type="radio" name="mode" value="annual" checked> 額面年収で入力</label>
+      <label><input type="radio" name="mode" value="monthly"> 額面月収で入力</label>
+    </div>
+    <div id="annualBox" class="grid">
+      <label>額面年収(賞与込み)<span class="unit"><input id="annual" type="number" min="0" step="10000" value="4500000">円</span></label>
+      <label>うち賞与<span class="unit"><input id="bonusAnnual" type="number" min="0" step="10000" value="0">円</span></label>
+    </div>
+    <div id="monthlyBox" class="grid" hidden>
+      <label>額面月収<span class="unit"><input id="monthly" type="number" min="0" step="1000" value="300000">円</span></label>
+      <label>賞与(月収の何か月分/年)<span class="unit"><input id="bonusMonths" type="number" min="0" step="0.1" value="0">か月</span></label>
+    </div>
+    <div class="grid">
+      <label>年齢
+        <select id="age40"><option value="0">40歳未満</option><option value="1">40〜64歳(介護保険料あり)</option></select>
+      </label>
+      <label>配偶者控除の対象となる配偶者
+        <select id="spouse"><option value="0">いない</option><option value="1">いる</option></select>
+      </label>
+      <label>扶養親族(控除対象)の人数
+        <span class="unit"><input id="deps" type="number" min="0" step="1" value="0">人</span>
+      </label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. 働く時間</h2>
+    <div class="grid">
+      <label>1日の実働時間<span class="unit"><input id="workHours" type="number" min="0" step="0.25" value="8">時間</span></label>
+      <label>月の出勤日数<span class="unit"><input id="days" type="number" min="0" step="0.5" value="20">日</span></label>
+    </div>
+    <p class="hint">時給に「含める」時間を選びます(チェックしたぶん拘束時間が増え、時給が下がります)。</p>
+    <div class="extras">
+      <label class="extra"><input id="incBreak" type="checkbox"> 休憩時間<span class="unit"><input id="breakMin" type="number" min="0" step="5" value="60">分/日</span></label>
+      <label class="extra"><input id="incCommute" type="checkbox" checked> 通勤時間(往復)<span class="unit"><input id="commuteMin" type="number" min="0" step="5" value="60">分/日</span></label>
+      <label class="extra"><input id="incPrep" type="checkbox"> 身支度など<span class="unit"><input id="prepMin" type="number" min="0" step="5" value="30">分/日</span></label>
+      <label class="extra"><input id="incOther" type="checkbox"> その他(昼食の移動、着替え等)<span class="unit"><input id="otherMin" type="number" min="0" step="5" value="0">分/日</span></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. 毎月の生活費(手取りから引く分)</h2>
+    <div id="living"></div>
+    <button id="addRow" type="button" class="ghost">+ 項目を追加</button>
+    <p class="total">合計 <strong id="livingTotal">0円</strong>/月</p>
+  </section>
+
+  <section class="card result" aria-live="polite">
+    <h2>結果</h2>
+    <div class="hero">
+      <div class="hero-label">可処分時給</div>
+      <div class="hero-value" id="rDisposable">-</div>
+      <div class="hero-sub" id="rDisposableNote"></div>
+    </div>
+    <dl class="steps">
+      <div><dt>額面年収</dt><dd id="rGross">-</dd></div>
+      <div><dt>手取り(概算)</dt><dd><span id="rNetMonthly">-</span>/月 <small id="rNetAnnual"></small></dd></div>
+      <div class="sub"><dt>内訳(年)</dt><dd id="rBreakdown">-</dd></div>
+      <div><dt>拘束時間</dt><dd id="rHours">-</dd></div>
+      <div><dt>額面ベースの時給</dt><dd id="rNominal">-</dd></div>
+      <div><dt>手取りベースの時給(実働)</dt><dd id="rNetPaid">-</dd></div>
+      <div><dt>実質時給(手取り ÷ 拘束時間)</dt><dd id="rReal">-</dd></div>
+      <div><dt>生活費を引いた手取り</dt><dd id="rAfter">-</dd></div>
+      <div><dt>生活費を稼ぐための労働</dt><dd id="rLivingHours">-</dd></div>
+    </dl>
+    <div id="bar" class="bar" aria-hidden="true"></div>
+    <p class="legend" id="barLegend"></p>
+  </section>
+
+  <p class="note">税・社会保険は概算です(健康保険5%・厚生年金9.15%・雇用保険0.55%、令和7年分以降の所得税、住民税10%+均等割5,000円で計算。賞与の上限や会社ごとの保険料率・医療費控除・各種控除は考慮していません)。正確な金額は給与明細や源泉徴収票で確認してください。</p>
+</main>
+<script src="calc.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
